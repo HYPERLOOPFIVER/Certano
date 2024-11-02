@@ -25,6 +25,14 @@ export default function Navbar() {
                 </button>
             </div>
             <nav className={`${styles.nav} ${isOpen ? styles.navOpen : ''}`}>
+            <div className={styles.log}>
+                <Link to={'/'} className={styles.link}>
+                    <h2>Certano</h2>
+                </Link>
+                <button className={styles.menuButton} onClick={toggleMenu}>
+                    {isOpen ? <AiOutlineClose /> : <AiOutlineMenu />}
+                </button>
+            </div>
                 <Link to={'/'} className={styles.link} onClick={toggleMenu}>
                     <IoMdHome className={styles.icon} />
                 </Link>
