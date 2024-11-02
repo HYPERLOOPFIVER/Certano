@@ -60,7 +60,7 @@ const PostUpload = () => {
 
   return (
  <>   <center><div className={styles.postcontainer}>
- <h1>Certano</h1>
+ 
  <center><h2>Create a New Post</h2></center>
  {error && <p style={{ color: 'red' }}>{error}</p>}
  <form onSubmit={handlePostUpload}>

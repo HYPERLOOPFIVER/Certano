@@ -29,7 +29,7 @@ const NewsComponent = () => {
   return (
     <div>
       
-      <h1>Certano</h1>
+      
       <center><h1 className={styles.Certtimes}>Certano Times</h1></center>
 
       

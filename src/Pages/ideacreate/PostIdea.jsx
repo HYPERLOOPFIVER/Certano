@@ -32,7 +32,7 @@ const PostIdea = () => {
    
    
    
-   <h1>Certano</h1>
+   
    
    
    <div style={styles.container}>

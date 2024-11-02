@@ -40,7 +40,7 @@ const Signup = () => {
 
   return (
     <>
-      <h2>Signup</h2>
+      
       <center><h3
       style={{
   fontFamily:'fantasy'

@@ -76,7 +76,7 @@ const FetchIdeas = () => {
 
   return (
     <div style={containerStyle}>
-      <h5>Certano</h5>
+      
       <p style={descriptionStyle}>
         Share and explore innovative ideas with the community.
       </p>
