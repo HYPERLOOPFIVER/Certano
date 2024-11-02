@@ -1,0 +1,82 @@
+.AuthMenu {
+    text-align: center;
+  }
+  
+  .header {
+    background-color: #333;
+    padding: 10px 0;
+  }
+  
+  .navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+  }
+  
+  .menu {
+    list-style-type: none;
+    padding: 0;
+    display: flex;
+    gap: 20px;
+    margin: 0;
+  }
+  
+  .menu li {
+    display: inline;
+  }
+  
+  .menu a {
+    color: white;
+    text-decoration: none;
+    padding: 14px 20px;
+    display: inline-block;
+  }
+  
+  .menu a:hover {
+    background-color: #555;
+  }
+  
+  .authSection {
+    position: relative;
+  }
+  
+  .authButton {
+    background-color: #444;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .authButton:hover {
+    background-color: #666;
+  }
+  
+  .authMenu {
+    list-style: none;
+    position: absolute;
+    top: 40px;
+    right: 0;
+    background-color: #333;
+    padding: 0;
+    margin: 0;
+    width: 120px;
+    border: 1px solid #222;
+  }
+  
+  .authMenu li {
+    text-align: left;
+  }
+  
+  .authMenu li a {
+    color: white;
+    text-decoration: none;
+    padding: 10px;
+    display: block;
+  }
+  
+  .authMenu li a:hover {
+    background-color: #555;
+  }
+  
