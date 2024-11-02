@@ -1,6 +1,3 @@
-
-import Cardion from '../card/Card'
-import styles from '../Trending/Trend.module.css'
 export default function Trend(){
     return(
         
