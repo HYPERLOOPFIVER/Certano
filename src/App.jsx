@@ -10,7 +10,7 @@ import News from './Pages/News/News';
 import PostUpload from './Pages/Create Post/Createpost';
 import Reels from './Pages/Reels/Reels';
 import FetchIdeas from './Pages/Ideas/Idea';
-import PostIdea from './Pages/ideacreate/idc';
+import PostIdea from './Pages/ideacreate/PostIdea';
 function App() {
  
 
