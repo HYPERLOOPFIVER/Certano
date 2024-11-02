@@ -4,7 +4,6 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from './Componenets/Navbar/Nav';
 import Trending from './Pages/Trending/Trending';
 import Login from './Pages/Auth/Login';
-import AuthMenu from './Menus/Menuauth';
 import Signup  from './Pages/Auth/signup/Signup';
 import News from './Pages/News/News';
 import PostUpload from './Pages/Create Post/Createpost';
