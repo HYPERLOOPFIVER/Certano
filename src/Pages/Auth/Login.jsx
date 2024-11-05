@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { auth, db } from '../../firebase/Firebase';
-import { signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'firebase/auth';
+import { GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'firebase/auth';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { Link } from 'react-router-dom';
 
@@ -33,7 +33,6 @@ const LoginPage = () => {
         id: doc.id,
         ...doc.data(),
       }));
-      console.log('Fetched Posts:', postsList);
       setPosts(postsList);
       fetchCommentsForPosts(postsList);
     } catch (error) {
@@ -70,6 +69,15 @@ const LoginPage = () => {
     }
   };
 
+  const handleGoogleLogin = async () => {
+    const provider = new GoogleAuthProvider();
+    try {
+      await signInWithPopup(auth, provider);
+    } catch (error) {
+      setError('Error logging in with Google: ' + error.message);
+    }
+  };
+
   const handleLogout = async () => {
     try {
       await signOut(auth);
@@ -81,7 +89,7 @@ const LoginPage = () => {
   return (
     <>
       <h2 style={{ textAlign: 'center', color: '#00aaff', marginBottom: '20px' }}>Login</h2>
-      <center><h3 style={{ color: 'cornsilk',fontFamily:'fantasy' }}>CERTANO OVER UNCERTAINTY!</h3></center>
+      <center><h3 style={{ color: 'cornsilk', fontFamily: 'fantasy' }}>CERTANO OVER UNCERTAINTY!</h3></center>
       <div style={{
           maxWidth: '800px',
           margin: '30px auto',
@@ -94,8 +102,8 @@ const LoginPage = () => {
           transition: 'all 0.3s ease'
         }}>
         {user ? (
-          <div className="profile-section" style={{ textAlign: 'center' }}>
-            <h2 style={{ color: 'white',fontFamily:'fantasy' }}>Welcome, {user.displayName || user.email}</h2>
+          <div style={{ textAlign: 'center' }}>
+            <h2 style={{ color: 'white', fontFamily: 'fantasy' }}>Welcome, {user.displayName || user.email}</h2>
             <img
               src={user.photoURL || 'https://via.placeholder.com/150'}
               alt="Profile"
@@ -109,8 +117,7 @@ const LoginPage = () => {
                 boxShadow: '0 4px 10px rgba(0, 0, 0, 0.5)'
               }}
             />
-            <p           style={{fontFamily:'sans-serif', color:'white'}}         >Email: <strong>{user.email}</strong></p>
-            <p>User Id: <strong>{user.uid}</strong></p>
+            <p style={{ fontFamily: 'sans-serif', color: 'white' }}>Email: <strong>{user.email}</strong></p>
             <button
               onClick={handleLogout}
               style={{
@@ -120,11 +127,10 @@ const LoginPage = () => {
                 border: 'none',
                 borderRadius: '5px',
                 cursor: 'pointer',
-                display: 'block',
-                margin: '20px auto',
                 fontSize: '16px',
                 transition: 'transform 0.3s',
                 boxShadow: '0 4px 10px rgba(0, 0, 0, 0.3)',
+                margin: '20px auto',
               }}
               onMouseOver={(e) => {
                 e.target.style.transform = 'scale(1.05)';
@@ -135,41 +141,6 @@ const LoginPage = () => {
             >
               Logout
             </button>
-
-            <div className="user-posts-section" style={{ marginTop: '30px' }}>
-              <h3 style={{ color: '#00aaff' }}>Your Posts</h3>
-              {posts.length > 0 ? (
-                <ul style={{ listStyleType: 'none', padding: '0' }}>
-                  {posts.map((post) => (
-                    <li key={post.id} style={{
-                      marginBottom: '20px',
-                      padding: '15px',
-                      backgroundColor: '#252525',
-                      borderRadius: '10px',
-                      boxShadow: '0 4px 10px rgba(0, 0, 0, 0.3)'
-                    }}>
-                      <h4 style={{ color: '#ffcc00' }}>{post.title}</h4>
-                      <p style={{ color: '#ccc' }}>{post.description}</p>
-                      <h5 style={{ color: '#00aaff' }}>Comments:</h5>
-                      <ul style={{ listStyleType: 'none', padding: '0' }}>
-                        {comments[post.id]?.length > 0 ? (
-                          comments[post.id].map((comment) => (
-                            <li key={comment.id} style={{ marginBottom: '10px' }}>
-                              <p style={{ color: '#999' }}> Comment:  {comment.commentText}</p>
-                              <small style={{ color: '#888' }}>By: {comment.commentBy}</small>
-                            </li>
-                          ))
-                        ) : (
-                          <p style={{ color: '#999' }}>No Comments</p>
-                        )}
-                      </ul>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p style={{ color: '#999' }}>You haven't created any posts yet.</p>
-              )}
-            </div>
           </div>
         ) : (
           <div className="login-form" style={{ textAlign: 'center' }}>
@@ -187,18 +158,8 @@ const LoginPage = () => {
                   marginBottom: '15px',
                   border: '1px solid #00aaff',
                   borderRadius: '5px',
-                  fontSize: '16px',
                   backgroundColor: '#333',
                   color: '#f0f0f0',
-                  transition: 'background 0.3s ease, border-color 0.3s ease',
-                }}
-                onFocus={(e) => {
-                  e.target.style.backgroundColor = '#252525';
-                  e.target.style.borderColor = '#005f7f';
-                }}
-                onBlur={(e) => {
-                  e.target.style.backgroundColor = '#333';
-                  e.target.style.borderColor = '#00aaff';
                 }}
               />
               <input
@@ -212,18 +173,8 @@ const LoginPage = () => {
                   marginBottom: '20px',
                   border: '1px solid #00aaff',
                   borderRadius: '5px',
-                  fontSize: '16px',
                   backgroundColor: '#333',
                   color: '#f0f0f0',
-                  transition: 'background 0.3s ease, border-color 0.3s ease',
-                }}
-                onFocus={(e) => {
-                  e.target.style.backgroundColor = '#252525';
-                  e.target.style.borderColor = '#005f7f';
-                }}
-                onBlur={(e) => {
-                  e.target.style.backgroundColor = '#333';
-                  e.target.style.borderColor = '#00aaff';
                 }}
               />
               <button
@@ -236,21 +187,44 @@ const LoginPage = () => {
                   borderRadius: '5px',
                   cursor: 'pointer',
                   fontSize: '16px',
-                  transition: 'transform 0.3s ease',
-                  boxShadow: '0 4px 10px rgba(0, 0, 0, 0.3)',
-                }}
-                onMouseOver={(e) => {
-                  e.target.style.transform = 'scale(1.05)';
-                }}
-                onMouseOut={(e) => {
-                  e.target.style.transform = 'scale(1)';
+                  transition: 'transform 0.3s',
                 }}
               >
                 Login
               </button>
             </form>
-            <p style={{ marginTop: '15px', color: '#f0f0f0' }}>
-              Don't have an account? <Link to="/signup" style={{ color: '#ffcc00' }}>Sign up</Link>
+            <button
+              onClick={handleGoogleLogin}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '12px',
+                backgroundColor: '#4285F4',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '5px',
+                cursor: 'pointer',
+                fontSize: '16px',
+                marginTop: '20px',
+                transition: 'background 0.3s, transform 0.3s',
+                boxShadow: '0 4px 10px rgba(0, 0, 0, 0.3)',
+              }}
+              onMouseOver={(e) => {
+                e.target.style.backgroundColor = '#357ae8';
+                e.target.style.transform = 'scale(1.05)';
+              }}
+              onMouseOut={(e) => {
+                e.target.style.backgroundColor = '#4285F4';
+                e.target.style.transform = 'scale(1)';
+              }}
+            >
+              
+              
+              Login with Google
+            </button>
+            <p style={{ marginTop: '20px', color: '#f0f0f0' }}>
+              Don't have an account? <Link to="/signup" style={{ color: '#00aaff' }}>Sign up</Link>
             </p>
           </div>
         )}
