@@ -113,7 +113,7 @@ const Post = () => {
       <h2 className={styles.header}></h2>
       <input
         type="text"
-        placeholder="Search posts ❔"
+        placeholder="Search "
         value={filter}
         onChange={(e) => setFilter(e.target.value)} // Update filter on input change
         className={styles.filterInput} // Add a CSS class for styling

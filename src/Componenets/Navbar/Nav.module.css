@@ -1,47 +1,106 @@
-.nav {
-    background-color: #f8f9fa; /* light grey background */
-   width: 5%;
-    height: 100vh;
+/* Header Styling */
+.header {
+    width: 15%;
     position: fixed;
-    left: 0;
     top: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: start;
-    padding-top: 20px;
-}
-
-.link {
-    margin: 15px 0;
-    color: black;
-    text-decoration: none;
-}
-
-.icon {
-    font-size: 1.4rem;
-    color: #f8f9fa;
-}
-.nav{
-    background-color: black;
-    border-radius: 2px,white;
-    
-}
-.log{
-    background-color: rgb(0, 0, 0);
-    margin-top: 0%;
-
-    width: 100%;
-    margin: 0;
-     
-}
-.log h2{
-    
-color: cornsilk;
-    
-    font-family: cursive;
-}
-.icon:hover{
+    left: 0;
+    background-color: rgb(255, 255, 255);
+    text-align: center;
+    padding: 10px 0;
    
-    color: cornsilk;
-}
+    z-index: 1000; /* Ensures header is always visible */
+  }
+  
+  /* Logo Styling */
+  .logo {
+    font-size: 30px;
+    background: -webkit-linear-gradient(#110202, #0e5abe, rgb(3, 3, 34), Red);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-family: cursive;
+    margin: 0;
+  }
+  
+  /* Navbar Styling */
+  .nav {
+    background-color: rgb(255, 255, 255); /* Gradient Background */
+    width: 100%;
+    height: 60px;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    box-shadow: 0px -2px 5px rgba(0, 0, 0, 0.1);
+    z-index: 999;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Navbar Link Styling */
+  .link {
+    color: rgb(0, 0, 0);
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    flex-direction: column; /* Align icon and text vertically */
+  }
+  
+  /* Icon Styling */
+  .icon {
+    font-size: 1.7rem;
+    color: #000000;
+    margin-bottom: 5px; /* Adds spacing between icon and text */
+  }
+  
+  /* Icon Hover Effect */
+  .icon:hover {
+    color: rgb(233, 186, 0); /* Change icon color on hover */
+  }
+  
+  /* Desktop View Adjustments */
+  @media (min-width: 768px) {
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 15%;
+      height: 100vh;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      padding-top: 60px; /* Space for logo */
+    }
+  
+    .link {
+      flex-direction: row; /* Align icon and text horizontally */
+      margin: 15px 0;
+    }
+  
+    .icon {
+      margin-bottom: 0; /* Remove vertical spacing */
+      margin-right: 10px; /* Add horizontal spacing */
+    }
+  }
+  
+  /* Ball Effects */
+  .ball {
+    display: block;
+    width: 150px;
+    height: 150px;
+    margin: 50px auto 0;
+    border-radius: 50%;
+  }
+  
+  .b1 {
+    background-color: rgb(49, 145, 231);
+    box-shadow: inset -25px -15px 40px rgba(0, 0, 0, 0.3);
+    background-image: linear-gradient(-45deg, rgba(255, 255, 220, 0.3) 0%, transparent 100%);
+  }
+  
+  .b2 {
+    background: radial-gradient(circle at 65% 15%, white 1px, aqua 3%, darkblue 60%, aqua 100%);
+  }
+  

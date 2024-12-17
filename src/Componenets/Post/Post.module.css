@@ -1,227 +1,223 @@
-/* Post.module.css */
-
+/* Container styles */
 .container {
-  max-width: 1200px;
-  margin: 30px auto;
+  background: #f8f9fa; /* Light background */
+  color: #333333; /* Neutral text color */
   padding: 20px;
-  background-color: #1c1c1c;
-  border-radius: 15px;
-  box-shadow: 0 6px 30px rgba(0, 0, 0, 0.5);
-  animation: fadeIn 0.5s ease;
+  border-radius: 12px;
+  max-width: 1200px;
+  margin: 20px auto;
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+  font-family: 'Inter', sans-serif;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .container {
-    padding: 15px;
-  }
-  .header {
-    font-size: 1.5rem;
-    margin-bottom: 20px;
-  }
-}
-
+/* Header */
 .header {
+  font-size: 2.5rem;
+  font-weight: 700;
   text-align: center;
-  color: #f5f5f5;
-  font-family: 'Arial', sans-serif;
-  font-size: 2rem;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
+  background: linear-gradient(90deg, #007bff, #ff7b00);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-.loadingText,
-.errorText {
-  color: #f5f5f5;
-  text-align: center;
-  font-size: 1.2rem;
+/* Filter input */
+.filterInput {
+  width: 100%;
+  padding: 10px 15px;
+  margin-bottom: 20px;
+  border: 2px solid #dddddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  color: #333333;
+  background: #ffffff;
+  outline: none;
+  transition: border 0.3s, box-shadow 0.3s;
 }
 
+.filterInput::placeholder {
+  color: #bbbbbb;
+}
+
+.filterInput:focus {
+  border: 2px solid #007bff;
+  box-shadow: 0 0 8px rgba(0, 123, 255, 0.3);
+}
+
+/* Post grid */
 .postGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: 1fr; /* Ensure only one post per row */
   gap: 20px;
 }
 
-/* Adjust for smaller screens */
-@media (max-width: 480px) {
-  .postGrid {
-    grid-template-columns: 1fr;
-  }
-}
-
+/* Post items */
+/* Post items */
 .postItem {
-  border: 1px solid #444;
+  position: relative; /* Required for ::after */
+  background: #ffffff;
   border-radius: 12px;
-  padding: 20px;
-  background-color: #292929;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  transition: transform 0.2s, box-shadow 0.2s;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  padding: 10px; /* Reduced padding */
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Slightly smaller shadow */
+  transition: transform 0.3s, box-shadow 0.3s;
+  overflow: hidden; /* Ensure mirror effect stays contained */
+  width: 200%; /* Adjust width to make posts smaller */
+  max-width: 400px; /* Limit max width for large screens */
+  margin: 0 auto; /* Center posts */
 }
 
 .postItem:hover {
   transform: translateY(-5px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+  box-shadow: 0px 8px 20px rgba(11, 119, 221, 0.2);
 }
 
+
+/* Mirror effect using ::after */
+.postItem::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: 100%;
+  background: inherit; /* Mirror the post item */
+  transform: scaleY(-1); /* Flip vertically */
+  opacity: 0.2; /* Slight transparency for a realistic look */
+  filter: blur(5px); /* Blur for a softer reflection */
+  pointer-events: none; /* Prevent interaction */
+}
+
+/* Post title */
 .postTitle {
-  margin: 0 0 10px;
-  color: #1e90ff;
-  font-family: 'Arial', sans-serif;
   font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: #007bff;
+  text-transform: capitalize;
 }
 
-@media (max-width: 480px) {
-  .postTitle {
-    font-size: 1.2rem;
-  }
-}
-
+/* Post description */
 .postDescription {
-  color: #d3d3d3;
+  font-size: 1rem;
+  color: #555555;
+  margin-bottom: 15px;
   line-height: 1.6;
-  flex-grow: 1;
 }
 
+/* Post image */
 .postImage {
   width: 100%;
-  height: auto;
-  max-width: 100%;
-  border-radius: 10px;
-  margin-bottom: 10px;
-  border: 1px solid #555;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
 }
 
+/* User info */
 .userInfo {
-  display: block;
-  margin: 5px 0;
-  color: #aaa;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+  color: #777777;
+  margin-bottom: 15px;
 }
 
+/* Comment form */
 .commentForm {
-  margin-top: 15px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 10px;
 }
 
 .textarea {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #444;
-  border-radius: 5px;
-  resize: vertical;
-  min-height: 60px;
-  background-color: #333;
-  color: #f5f5f5;
-  font-family: 'Arial', sans-serif;
+  flex-grow: 1;
+  padding: 10px;
+  border-radius: 8px;
+  background: #f8f9fa;
+  border: 2px solid #dddddd;
+  font-size: 1rem;
+  color: #333333;
+  resize: none;
+  outline: none;
+  transition: border 0.3s, box-shadow 0.3s;
+}
+
+.textarea:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 8px rgba(0, 123, 255, 0.3);
 }
 
 .submitButton {
-  margin-top: 10px;
-  padding: 12px 20px;
-  color: white;
-  background-color: #ffffff00;
+  background: linear-gradient(90deg, #007bff, #ff7b00);
+  color: #ffffff;
+  padding: 10px 15px;
   border: none;
-  border-radius: 5px;
+  border-radius: 8px;
   cursor: pointer;
-  font-size: 2em;
-  transition: background-color 0.3s, transform 0.2s;
+  font-size: 1.2rem;
+  transition: transform 0.2s, box-shadow 0.3s;
 }
 
 .submitButton:hover {
-  transform: translateY(-2px);
+  transform: scale(1.05);
+  box-shadow: 0px 4px 15px rgba(0, 123, 255, 0.4);
 }
 
-.commentButton {
-  margin-top: 10px;
-  padding: 12px 20px;
-  background-color: #444;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: background-color 0.3s, transform 0.2s;
-}
-
-.commentButton:hover {
-  background-color: #555;
-  transform: translateY(-2px);
-}
-
+/* Comments section */
 .commentsContainer {
-  margin-top: 10px;
-  border-top: 1px solid #444;
-  padding-top: 10px;
+  margin-top: 20px;
+  padding: 10px 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #eeeeee;
 }
 
 .opinionHeader {
-  color: #f5f5f5;
   font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: #007bff;
 }
 
 .opinionText {
-  color: #ccc;
-  margin: 5px 0;
+  font-size: 1rem;
+  color: #555555;
+  margin-bottom: 10px;
 }
 
 .opinionUser {
-  color: #aaa;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+  color: #777777;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
+/* Show more button */
 .showMoreButton {
-  background-color: #000000;
-  color: white;
-  border: none;
-  border-radius: 12px;
-  padding: 10px 20px;
-  font-size: 14px;
-  font-weight: bold;
-  cursor: pointer;
+  display: inline-block;
   margin-top: 10px;
-  transition: background-color 0.3s ease, transform 0.3s ease;
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  color: #ffffff;
+  background: linear-gradient(90deg, #007bff, #ff7b00);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.3s;
 }
 
 .showMoreButton:hover {
-  background-color: #000000;
   transform: scale(1.05);
+  box-shadow: 0px 4px 15px rgba(255, 123, 0, 0.4);
 }
 
-.showMoreButton:active {
-  background-color: #000000;
-  transform: scale(0.98);
+/* Loading and error texts */
+.loadingText, .errorText {
+  font-size: 1.2rem;
+  text-align: center;
+  margin-top: 20px;
+  color: #ff7b00;
 }
 
-.filterInput {
-  margin-bottom: 20px;
-  padding: 10px;
-  width: 100%;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-/* Additional mobile-specific adjustments */
-@media (max-width: 480px) {
-  .header,
-  .loadingText,
-  .errorText {
-    font-size: 1rem;
-  }
-  .submitButton {
-    font-size: 1.5em;
-  }
-  .commentButton {
-    font-size: 14px;
+/* For all screen sizes, ensure only one post per row */
+@media (max-width: 1024px) {
+  .postGrid {
+    grid-template-columns: 1fr; /* One post per row */
   }
 }

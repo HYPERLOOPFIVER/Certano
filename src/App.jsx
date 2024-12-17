@@ -10,6 +10,7 @@ import PostUpload from './Pages/Create Post/Createpost';
 import Reels from './Pages/Reels/Reels';
 import FetchIdeas from './Pages/Ideas/Idea';
 import PostIdea from './Pages/ideacreate/PostIdea';
+import SearchPage from './Pages/Auth/SearchPage';
 function App() {
  
 
@@ -22,7 +23,7 @@ function App() {
           <Route path="/" element={<Login />} />
            <Route path="/Home" element={<Home />}/>
            <Route path="/Trending" element={<Trending/>}/>
-         
+           <Route path="/search" element={<SearchPage/>}/>
           <Route path="/signup" element={<Signup />} />
           <Route path="/News" element={<News />} />
           <Route path="/PostUpload" element={<PostUpload />} />
