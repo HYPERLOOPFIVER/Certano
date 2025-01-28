@@ -1,0 +1,202 @@
+/* Dark Theme with Instagram-like Styling */
+.user-profile-container {
+  background-color: #181818;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.profile-card {
+  background-color: #2a2a2a;
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  max-width: 1000px;
+  margin-top: 30px;
+  padding: 30px;
+}
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.profile-image-container {
+  position: relative;
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-right: 20px;
+}
+
+.profile-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-info {
+  flex: 1;
+}
+
+.profile-info h2 {
+  font-size: 24px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.profile-info p {
+  margin: 10px 0;
+  color: #ccc;
+}
+
+.follow-info {
+  display: flex;
+  gap: 20px;
+  margin: 10px 0;
+}
+
+.follow-info span {
+  font-size: 14px;
+  color: #ccc;
+}
+
+.follow-btn {
+  background: linear-gradient(135deg, #0095f6, #0049b7);
+  color: white;
+  border: none;
+  padding: 10px 30px;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.3s;
+  margin-top: 15px;
+}
+
+.follow-btn:hover {
+  background: linear-gradient(135deg, #0049b7, #0095f6);
+  transform: scale(1.05);
+}
+
+.follow-btn.unfollow {
+  background: #ef3e42;
+}
+
+.follow-btn.unfollow:hover {
+  background: #d42e32;
+}
+
+.profile-content h3 {
+  font-size: 22px;
+  margin-top: 30px;
+}
+
+.stats {
+  display: flex;
+  gap: 20px;
+  margin: 20px 0;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-item strong {
+  font-size: 18px;
+}
+
+.media-gallery {
+  margin-top: 20px;
+}
+
+.media-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+.media-item {
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.media-image,
+.media-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10px;
+}
+.media-gallery {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.media-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+  width: 100%;
+  max-width: 800px;
+}
+
+.media-item {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.media-item video {
+  max-width: 100%;
+  height: auto;
+}
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 80%;
+  max-width: 600px;
+  position: relative;
+  text-align: center;
+}
+
+.close-modal {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 30px;
+  color: rgb(0, 0, 0);
+  cursor: pointer;
+}
+
+.media-details {
+  margin-top: 20px;
+}
+
+.modal-image, .modal-video {
+  width: 100%;
+  margin-top: 20px;
+}

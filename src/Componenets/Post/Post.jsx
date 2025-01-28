@@ -127,7 +127,7 @@ const Post = () => {
               <h3 className={styles.postTitle}>{post.title}</h3>
               <p className={styles.postDescription}>{post.description}</p>
               {post.image && (
-                <img src={post.image} alt={post.title} className={styles.postImage} />
+                <img src={post.image} alt={post.title} className={styles.postImage} /> // Ensure this points to Cloudinary URL
               )}
               <span className={styles.userInfo}>Posted by User ID: {post.uid}</span>
               <form onSubmit={(e) => handleCommentSubmit(e, post)} className={styles.commentForm}>

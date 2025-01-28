@@ -6,34 +6,34 @@ import { FaArrowTrendUp, FaNewspaper } from "react-icons/fa6";
 import { HiOutlineLightBulb } from "react-icons/hi";
 import { PiFilmReelThin } from "react-icons/pi";
 import { CiCirclePlus } from "react-icons/ci";
+import { SlMagnifier } from "react-icons/sl";
+import { TiMessageTyping } from "react-icons/ti";
 
 export default function Navbar() {
   return (
     <>
-      <header className={styles.header}>
-        <h2 className={styles.logo}>Certano</h2>
-      </header>
+    
       <nav className={styles.nav}>
         <Link to="/Home" className={styles.link}>
-          <IoMdHome className={styles.icon} /> Home
+          <IoMdHome className={styles.icon} /> 
         </Link>
         <Link to="/Trending" className={styles.link}>
-          <FaArrowTrendUp className={styles.icon} /> Trending
+          <FaArrowTrendUp className={styles.icon} /> 
         </Link>
-        <Link to="/News" className={styles.link}>
-          <FaNewspaper className={styles.icon} /> News
+        <Link to="/serch" className={styles.link}>
+          <SlMagnifier className={styles.icon} /> 
         </Link>
         <Link to="/FetchIdeas" className={styles.link}>
-          <HiOutlineLightBulb className={styles.icon} /> Ideas
+        <TiMessageTyping  className={styles.icon}  />
         </Link>
         <Link to="/Reels" className={styles.link}>
-          <PiFilmReelThin className={styles.icon} /> Reels
+          <PiFilmReelThin className={styles.icon} /> 
         </Link>
         <Link to="/PostUpload" className={styles.link}>
-          <CiCirclePlus className={styles.icon} /> Create
+          <CiCirclePlus className={styles.icon} /> 
         </Link>
         <Link to="/" className={styles.link}>
-          <MdAccountCircle className={styles.icon} /> Account
+          <MdAccountCircle className={styles.icon} /> 
         </Link>
       </nav>
     </>

@@ -1,0 +1,359 @@
+/* ReelsDisplay.css */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+    background: black;
+  }
+  
+  .reels-container {
+    height: 100vh;
+    overflow-y: scroll;
+    scroll-snap-type: y mandatory;
+    background: black;
+  }
+  
+  .reel {
+    height: 100vh;
+    width: 100%;
+    position: relative;
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: black;
+  }
+  
+  .reel-content {
+    position: relative;
+    width: 90%;
+    max-width: 400px;
+    height: calc(100vw * 16 / 9);
+    max-height: 80vh;
+    background: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(255, 255, 255, 0.295);
+  }
+  
+  .reel-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    box-shadow: 0px 4px 15px rgba(227, 0, 0, 0.8); /* Soft shadow effect */
+    border-radius: 10px; /* Optional: Add rounded corners for a smoother look */
+}
+
+  
+  .reel-actions {
+    position: absolute;
+    right: 10px;
+    bottom: 20%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .reel-action {
+    background: transparent;
+    color: white;
+    border: none;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out;
+  }
+  
+  .reel-action:hover {
+    transform: scale(1.2);
+    color: #ff4081;
+  }
+  
+  .reel-details {
+    width: 90%;
+    max-width: 400px;
+    margin-top: 20px;
+    color: white;
+    text-align: left;
+  }
+  
+  .reel-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: aliceblue;
+  }
+  
+  .reel-description {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.937);
+  }
+  /* ReelsDisplay.css */
+.reel-uploader {
+    margin-top: 10px;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.8);
+  }
+  
+  .reel-email {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.6);
+  }
+  .comment-popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  
+  .comment-popup-content {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+  }
+  
+  .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 18px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .comment-list {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+  }
+  
+  .comment-list li {
+    margin-bottom: 10px;
+  }
+  /* Popup Overlay */
+.comment-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.75); /* Dark semi-transparent background */
+  display: flex;
+  align-items: center; /* Center vertically */
+  justify-content: center; /* Center horizontally */
+  z-index: 1000;
+  backdrop-filter: blur(10px); /* Soft blur effect */
+}
+
+/* Popup Container */
+.comment-popup-content {
+  width: 80%;
+  max-width: 500px; /* Wider popup for a premium feel */
+  background: rgba(50, 50, 50, 0.85); /* Subtle dark gray for background */
+  backdrop-filter: blur(25px); /* Frosted glass look */
+  border-radius: 16px; /* Rounded edges for sophistication */
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5); /* Subtle shadow for depth */
+  display: flex;
+  flex-direction: column;
+  max-height: 80%;
+  padding: 20px;
+  color: #fff; /* White text for contrast */
+}
+
+/* Close Button */
+.close-btn {
+  font-size: 20px;
+  color: #fff;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 10px;
+  text-align: right;
+  align-self: flex-end; /* Close button aligned to top-right */
+  transition: transform 0.3s ease;
+}
+
+.close-btn:hover {
+  color: #e0e0e0; /* Slight color change on hover */
+  transform: scale(1.1); /* Subtle scale effect */
+}
+
+/* Comment List */
+.comment-list {
+  flex: 1;
+  overflow-y: auto; /* Scrollable comment section */
+  padding: 15px;
+  margin-top: 10px;
+}
+
+.comment-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.comment-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.4); /* Light thumb color */
+  border-radius: 5px;
+}
+
+.comment-list li {
+  background: rgba(255, 255, 255, 0.1); /* Slight transparency for each comment */
+  padding: 12px;
+  margin-bottom: 12px;
+  border-radius: 12px; /* Soft rounded corners */
+  font-size: 14px;
+  line-height: 1.6;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Soft shadow for comments */
+}
+
+.comment-list li strong {
+  color: #4caf50; /* Green highlight for usernames */
+  font-weight: bold;
+  font-size: 15px;
+  margin-bottom: 5px;
+}
+
+/* Input Section */
+.comment-input-container {
+  display: flex;
+  align-items: center;
+  padding: 12px 15px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1); /* Soft divider line */
+  background: rgba(50, 50, 50, 0.85); /* Dark transparent input background */
+}
+
+.comment-input-container input {
+  flex: 1;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.08); /* Slightly transparent input background */
+  border: none;
+  border-radius: 25px; /* Soft, rounded input */
+  outline: none;
+  font-size: 16px;
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2); /* Soft shadow for input */
+}
+
+.comment-input-container input::placeholder {
+  color: #bbb; /* Subtle placeholder color */
+}
+
+.comment-input-container button {
+  background: #4caf50; /* Rich green background */
+  color: #fff;
+  padding: 10px 20px;
+  margin-left: 12px;
+  border: none;
+  border-radius: 25px; /* Rounded button */
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.comment-input-container button:hover {
+  background: #388e3c; /* Darker green on hover */
+  transform: translateY(-2px); /* Lift effect */
+}
+
+/* Subtle Animations */
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.comment-popup-content {
+  animation: fadeIn 0.4s ease-out; /* Fade-in animation for smoothness */
+}
+/* Input Section */
+.comment-input-container {
+  display: flex;
+  align-items: center;
+  padding: 12px 15px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1); /* Soft divider line */
+  background: rgba(50, 50, 50, 0.85); /* Dark, transparent input background */
+  border-radius: 12px; /* Rounded container */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Soft, elevated shadow */
+  transition: all 0.3s ease;
+}
+
+/* Input Field */
+.comment-input-container input {
+  flex: 1;
+  padding: 12px 18px;
+  background: rgba(255, 255, 255, 0.12); /* Soft, translucent background */
+  border: 2px solid rgba(255, 255, 255, 0.2); /* Subtle border for depth */
+  border-radius: 30px; /* Large rounded edges for smoothness */
+  font-size: 16px;
+  color: #fff;
+  outline: none;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15); /* Soft shadow for input */
+  transition: all 0.3s ease;
+}
+
+.comment-input-container input::placeholder {
+  color: #bbb; /* Light gray placeholder text */
+}
+
+/* Input Field Focus Animation */
+.comment-input-container input:focus {
+  border-color: #4caf50; /* Green focus border */
+  box-shadow: 0 0 15px rgba(76, 175, 80, 0.5); /* Soft green glow */
+  background: rgba(255, 255, 255, 0.18); /* Slightly darker background when focused */
+}
+
+/* Button */
+.comment-input-container button {
+  background: linear-gradient(135deg, #4caf50, #388e3c); /* Premium green gradient */
+  color: #fff;
+  padding: 12px 22px;
+  margin-left: 15px;
+  border: none;
+  border-radius: 30px; /* Rounded, smooth button */
+  font-size: 16px;
+  font-weight: 600; /* Slightly bolder text for prominence */
+  cursor: pointer;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2); /* Soft, elevated shadow */
+  transition: all 0.3s ease;
+}
+
+/* Button Hover Animation */
+.comment-input-container button:hover {
+  transform: translateY(-3px); /* Slight lift effect on hover */
+  background: linear-gradient(135deg, #388e3c, #4caf50); /* Reverse gradient on hover */
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3); /* Enhanced shadow for hover effect */
+}
+
+/* Button Active (Click) Animation */
+.comment-input-container button:active {
+  transform: translateY(1px); /* Subtle depression when clicked */
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3); /* Slight reduction in shadow */
+}
+
+/* Button Disabled State */
+.comment-input-container button:disabled {
+  background: rgba(76, 175, 80, 0.4); /* Disabled state with transparency */
+  cursor: not-allowed;
+  box-shadow: none; /* No shadow for disabled state */
+}
+p {
+  color: #fff;
+}

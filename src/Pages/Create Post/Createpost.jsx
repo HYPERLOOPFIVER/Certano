@@ -1,28 +1,53 @@
 import React, { useState, useEffect } from 'react';
 import { db, auth } from '../../firebase/Firebase'; // Import Firestore and auth instances
-import { collection, addDoc } from 'firebase/firestore'; // Correct Firestore imports
+import { collection, addDoc, doc, updateDoc, arrayUnion } from 'firebase/firestore'; // Correct Firestore imports
 import { onAuthStateChanged } from '../../firebase/Firebase'; // Listen to authentication state changes
 import { Link } from 'react-router-dom';
+
+// Cloudinary setup
+const CLOUD_NAME = 'dzf155vhq';
+const UPLOAD_PRESET = 'posts_certano';
 
 const PostUpload = () => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [image, setImage] = useState('');
+  const [imageFile, setImageFile] = useState(null);
+  const [imageUrl, setImageUrl] = useState('');
   const [error, setError] = useState('');
-  const [user, setUser] = useState(null); // Store the logged-in user
+  const [user, setUser] = useState(null);
 
-  // Listen for authentication state changes to check if user is logged in
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
-        setUser(currentUser); // Set the logged-in user
+        setUser(currentUser);
       } else {
-        setUser(null); // No user is logged in
+        setUser(null);
       }
     });
 
-    return () => unsubscribe(); // Cleanup the listener on component unmount
+    return () => unsubscribe();
   }, []);
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', UPLOAD_PRESET);
+      formData.append('cloud_name', CLOUD_NAME);
+
+      try {
+        const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
+          method: 'POST',
+          body: formData,
+        });
+        const data = await response.json();
+        setImageUrl(data.secure_url); // Get the uploaded image URL
+      } catch (error) {
+        setError('Error uploading image');
+      }
+    }
+  };
 
   const handlePostUpload = async (e) => {
     e.preventDefault();
@@ -32,26 +57,31 @@ const PostUpload = () => {
       return;
     }
 
-    if (!title || !description || !image) {
+    if (!title || !description || !imageUrl) {
       setError('All fields are required');
       return;
     }
 
     try {
-      // Add a new document to the "posts" collection
-      await addDoc(collection(db, 'posts'), {
+      // Create a new post in the 'posts' collection
+      const postRef = await addDoc(collection(db, 'posts'), {
         title,
         description,
-        image,
-        uid: user.uid,  // Get user ID from the logged-in user
+        image: imageUrl,
+        uid: user.uid,
         createdAt: new Date(),
       });
 
-      // Clear the form fields after successful post upload
-      setTitle('');
-      setDescription('');
-      setImage('');
-      setError('');  // Clear any previous errors
+      // Now, update the user's document to include the new post's ID using arrayUnion
+      const userRef = doc(db, 'users', user.uid); // Get reference to user's document
+      await updateDoc(userRef, {
+        posts: arrayUnion(postRef.id), // Add post ID to user's posts array
+      });
+
+      setTitle(''); // Clear title input
+      setDescription(''); // Clear description input
+      setImageUrl(''); // Clear image URL
+      setError(''); // Clear error
       alert('Post uploaded successfully');
     } catch (error) {
       setError('Error uploading post: ' + error.message);
@@ -93,7 +123,6 @@ const PostUpload = () => {
                 borderRadius: '8px',
                 fontSize: '16px',
                 backgroundColor: '#f9f9f9',
-                transition: 'border 0.3s ease-in-out',
               }}
             />
             <textarea
@@ -110,14 +139,11 @@ const PostUpload = () => {
                 borderRadius: '8px',
                 fontSize: '16px',
                 backgroundColor: '#f9f9f9',
-                transition: 'border 0.3s ease-in-out',
               }}
             />
             <input
-              type="text"
-              value={image}
-              onChange={(e) => setImage(e.target.value)}
-              placeholder="Image URL"
+              type="file"
+              onChange={handleImageUpload}
               required
               style={{
                 width: '100%',
@@ -127,9 +153,9 @@ const PostUpload = () => {
                 borderRadius: '8px',
                 fontSize: '16px',
                 backgroundColor: '#f9f9f9',
-                transition: 'border 0.3s ease-in-out',
               }}
             />
+            {imageUrl && <img src={imageUrl} alt="Uploaded" style={{ width: '100%', marginBottom: '15px' }} />}
             <button
               type="submit"
               style={{
@@ -140,9 +166,8 @@ const PostUpload = () => {
                 borderRadius: '8px',
                 fontSize: '16px',
                 cursor: 'pointer',
-                transition: 'background-color 0.3s ease-in-out',
               }}
-              disabled={!user} // Disable button if user is not logged in
+              disabled={!user}
             >
               Post
             </button>
@@ -154,7 +179,7 @@ const PostUpload = () => {
 
       <center>
         <Link
-          to={'/PostIdea'}
+          to={'/Reelupload'}
           style={{
             display: 'inline-block',
             padding: '12px 20px',
@@ -166,10 +191,9 @@ const PostUpload = () => {
             textAlign: 'center',
             marginTop: '20px',
             textDecoration: 'none',
-            transition: 'background-color 0.3s ease-in-out',
           }}
         >
-          Post Idea
+          Post Reel
         </Link>
       </center>
     </>
