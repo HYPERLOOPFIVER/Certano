@@ -8,13 +8,16 @@ import { PiFilmReelThin } from "react-icons/pi";
 import { CiCirclePlus } from "react-icons/ci";
 import { SlMagnifier } from "react-icons/sl";
 import { TiMessageTyping } from "react-icons/ti";
-
+import Logo from '../../logo.png'
 export default function Navbar() {
   return (
     <>
     
       <nav className={styles.nav}>
-        <Link to="/Home" className={styles.link}>
+      <Link to="/Reels" className={styles.link}>
+          <img src={Logo} alt="" className={styles.log}/> 
+        </Link>
+<Link to="/Home" className={styles.link}>
           <IoMdHome className={styles.icon} /> 
         </Link>
         <Link to="/Trending" className={styles.link}>
@@ -23,7 +26,7 @@ export default function Navbar() {
         <Link to="/serch" className={styles.link}>
           <SlMagnifier className={styles.icon} /> 
         </Link>
-        <Link to="/FetchIdeas" className={styles.link}>
+        <Link to="/chat" className={styles.link}>
         <TiMessageTyping  className={styles.icon}  />
         </Link>
         <Link to="/Reels" className={styles.link}>

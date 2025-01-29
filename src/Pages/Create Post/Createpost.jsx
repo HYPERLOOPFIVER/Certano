@@ -183,7 +183,7 @@ const PostUpload = () => {
           style={{
             display: 'inline-block',
             padding: '12px 20px',
-            backgroundColor: 'white',
+            backgroundColor: 'black',
             color: 'black',
             border: 'none',
             borderRadius: '8px',

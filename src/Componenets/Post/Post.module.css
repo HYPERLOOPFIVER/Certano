@@ -1,12 +1,12 @@
 /* Container styles */
 .container {
-  background: #f8f9fa; /* Light background */
-  color: #333333; /* Neutral text color */
+  background: #000003; /* Dark background */
+  color: #e0e0e0; /* Light text color */
   padding: 20px;
   border-radius: 12px;
   max-width: 1200px;
   margin: 20px auto;
-  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3); /* Darker shadow */
   font-family: 'Inter', sans-serif;
 }
 
@@ -26,13 +26,14 @@
   width: 100%;
   padding: 10px 15px;
   margin-bottom: 20px;
-  border: 2px solid #dddddd;
+  border: 2px solid #ffffff; /* Darker border */
   border-radius: 8px;
   font-size: 1rem;
-  color: #333333;
-  background: #ffffff;
+  color: #e0e0e0; /* Light text color */
+  background: #333333; /* Dark background */
   outline: none;
   transition: border 0.3s, box-shadow 0.3s;
+  
 }
 
 .filterInput::placeholder {
@@ -47,30 +48,28 @@
 /* Post grid */
 .postGrid {
   display: grid;
-  grid-template-columns: 1fr; /* Ensure only one post per row */
+  grid-template-columns: 1fr;
   gap: 20px;
 }
 
 /* Post items */
-/* Post items */
 .postItem {
-  position: relative; /* Required for ::after */
-  background: #ffffff;
+  position: relative;
+  background: #160000; /* Dark post background */
   border-radius: 12px;
-  padding: 10px; /* Reduced padding */
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Slightly smaller shadow */
+  padding: 7px;
+  box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.986);
   transition: transform 0.3s, box-shadow 0.3s;
-  overflow: hidden; /* Ensure mirror effect stays contained */
-  width: 200%; /* Adjust width to make posts smaller */
-  max-width: 400px; /* Limit max width for large screens */
-  margin: 0 auto; /* Center posts */
+  overflow: hidden;
+  width: 200%;
+  max-width: 400px;
+  margin: 0 auto;
 }
 
 .postItem:hover {
   transform: translateY(-5px);
   box-shadow: 0px 8px 20px rgba(11, 119, 221, 0.2);
 }
-
 
 /* Mirror effect using ::after */
 .postItem::after {
@@ -80,11 +79,11 @@
   left: 0;
   right: 0;
   height: 100%;
-  background: inherit; /* Mirror the post item */
-  transform: scaleY(-1); /* Flip vertically */
-  opacity: 0.2; /* Slight transparency for a realistic look */
-  filter: blur(5px); /* Blur for a softer reflection */
-  pointer-events: none; /* Prevent interaction */
+  background: inherit;
+  transform: scaleY(-1);
+  opacity: 0.2;
+  filter: blur(5px);
+  pointer-events: none;
 }
 
 /* Post title */
@@ -99,7 +98,7 @@
 /* Post description */
 .postDescription {
   font-size: 1rem;
-  color: #555555;
+  color: #dcdcdc; /* Lighter text for descriptions */
   margin-bottom: 15px;
   line-height: 1.6;
 }
@@ -109,13 +108,13 @@
   width: 100%;
   border-radius: 8px;
   margin-bottom: 15px;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 /* User info */
 .userInfo {
   font-size: 0.85rem;
-  color: #777777;
+  color: #aaaaaa; /* Lighter user info text */
   margin-bottom: 15px;
 }
 
@@ -131,10 +130,10 @@
   flex-grow: 1;
   padding: 10px;
   border-radius: 8px;
-  background: #f8f9fa;
-  border: 2px solid #dddddd;
+  background: #3a3a3a; /* Darker text area background */
+  border: 2px solid #444444;
   font-size: 1rem;
-  color: #333333;
+  color: #e0e0e0;
   resize: none;
   outline: none;
   transition: border 0.3s, box-shadow 0.3s;
@@ -165,9 +164,9 @@
 .commentsContainer {
   margin-top: 20px;
   padding: 10px 15px;
-  background: #f8f9fa;
+  background: #2a2a2a; /* Darker background for comments */
   border-radius: 8px;
-  border: 1px solid #eeeeee;
+  border: 1px solid #444444;
 }
 
 .opinionHeader {
@@ -179,13 +178,13 @@
 
 .opinionText {
   font-size: 1rem;
-  color: #555555;
+  color: #dcdcdc; /* Light text for opinions */
   margin-bottom: 10px;
 }
 
 .opinionUser {
   font-size: 0.85rem;
-  color: #777777;
+  color: #aaaaaa; /* Lighter text for user */
 }
 
 /* Show more button */
@@ -218,6 +217,6 @@
 /* For all screen sizes, ensure only one post per row */
 @media (max-width: 1024px) {
   .postGrid {
-    grid-template-columns: 1fr; /* One post per row */
+    grid-template-columns: 1fr;
   }
 }

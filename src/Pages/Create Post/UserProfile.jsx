@@ -10,8 +10,9 @@ import {
   updateDoc,
   arrayUnion,
   arrayRemove,
+  setDoc,
 } from "firebase/firestore";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { auth } from "../../firebase/Firebase";
 import './UserProfile.css';
 
@@ -22,6 +23,7 @@ function UserProfile() {
   const [isFollowing, setIsFollowing] = useState(false);
   const [media, setMedia] = useState([]); // Combined posts and reels
   const [selectedMedia, setSelectedMedia] = useState(null); // Selected media for modal
+  const navigate = useNavigate(); // For navigation (replace useHistory with useNavigate)
 
   // Fetch the logged-in user's data
   useEffect(() => {
@@ -114,10 +116,7 @@ function UserProfile() {
     const currentUserRef = doc(db, "users", currentUser.id);
 
     try {
-      const [userSnap, currentUserSnap] = await Promise.all([
-        getDoc(userRef),
-        getDoc(currentUserRef),
-      ]);
+      const [userSnap, currentUserSnap] = await Promise.all([getDoc(userRef), getDoc(currentUserRef)]);
 
       if (!userSnap.exists() || !currentUserSnap.exists()) {
         console.error("User or Current User document does not exist");
@@ -139,6 +138,51 @@ function UserProfile() {
       }
     } catch (error) {
       console.error("Error updating follow state:", error);
+    }
+  };
+
+  // Handle checking if a chat room exists or create one
+  const handleChat = async () => {
+    if (!userId || !currentUser?.id) return;
+
+    try {
+      // Query to check if the chat room already exists with the two users
+      const chatRoomRef = collection(db, "chatRooms");
+      const q = query(
+        chatRoomRef,
+        where("users", "array-contains", currentUser.id),
+        where("users", "array-contains", userId)
+      );
+      const querySnapshot = await getDocs(q);
+
+      if (!querySnapshot.empty) {
+        // If chat room exists, navigate to the chat room
+        const chatRoomId = querySnapshot.docs[0].id;
+        navigate(`/chat/${chatRoomId}`); // Replace history.push with navigate
+      } else {
+        // If no chat room, create a new one
+        const newChatRoomRef = doc(chatRoomRef);
+        await setDoc(newChatRoomRef, {
+          users: [currentUser.id, userId],
+          messages: [],
+        });
+
+        // Add the new chat to the current user's sidebar chat list
+        const currentUserRef = doc(db, "users", currentUser.id);
+        await updateDoc(currentUserRef, {
+          chatRooms: arrayUnion(newChatRoomRef.id),
+        });
+
+        // Add the new chat to the profile user's sidebar chat list as well
+        const userRef = doc(db, "users", userId);
+        await updateDoc(userRef, {
+          chatRooms: arrayUnion(newChatRoomRef.id),
+        });
+
+        navigate(`/chat/${newChatRoomRef.id}`); // Navigate to the newly created chat room
+      }
+    } catch (error) {
+      console.error("Error handling chat:", error);
     }
   };
 
@@ -182,6 +226,9 @@ function UserProfile() {
             >
               {isFollowing ? "Unfollow" : "Follow"}
             </button>
+            <button className="chat-btn" onClick={handleChat}>
+              Chat
+            </button>
           </div>
         </div>
 
@@ -219,12 +266,12 @@ function UserProfile() {
             <div className="media-details">
               <span><strong>Likes:</strong> {selectedMedia.likes || 0}</span>
               <span><strong>Comments:</strong> {selectedMedia.comments?.length || 0}</span>
-              <span><strong>Views:</strong> {selectedMedia.views || 0}</span>
             </div>
-            {selectedMedia.type === "post" ? (
-              <img src={selectedMedia.image} alt="Post" className="modal-image" />
-            ) : (
-              <video src={selectedMedia.video} controls className="modal-video" />
+            {selectedMedia.type === "post" && (
+              <img src={selectedMedia.image} alt="Post Details" />
+            )}
+            {selectedMedia.type === "reel" && (
+              <video src={selectedMedia.video} controls />
             )}
           </div>
         </div>

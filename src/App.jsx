@@ -15,7 +15,7 @@ import ReelUpload from "./Pages/Create Post/ReelUpload";
 import AllUsers from "./Pages/Create Post/Profiles";
 import SearchUsers from "./Pages/Create Post/Searchusers";
 import UserProfile from "./Pages/Create Post/UserProfile";
-
+import ChatPage from "./Componenets/Navbar/ChatPage";
 function App() {
   const currentUser = { id: "exampleId", name: "Test User" }; // Replace with actual user
 
@@ -33,6 +33,7 @@ function App() {
         <Route path="/Reelupload" element={<ReelUpload />} />
         <Route path="/Reels" element={<Reels />} />
         <Route path="/PostIdea" element={<PostIdea />} />
+        <Route path="/chat" element={<ChatPage />} />
         <Route path="/serch" element={<SearchUsers />} />
         <Route path="/profile/:userId" element={<UserProfile currentUser={currentUser} />} />
         <Route path="/FetchIdeas" element={<FetchIdeas />} />

@@ -4,7 +4,7 @@
   flex-direction: row;
   align-items: center;
   justify-content: space-around;
-  background-color: #000000;
+  background-color: #010508;
   padding: 10px 0;
   position: fixed;
   bottom: 0;
@@ -57,5 +57,18 @@
 
   .icon {
     font-size: 28px;
+  }
+  
+}
+.log{
+  height: 45px;
+}
+@media (max-width: 767px) {
+  .log {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
 }
