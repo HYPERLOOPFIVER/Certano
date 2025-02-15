@@ -201,10 +201,9 @@
   .chat-input {
     display: flex;
     padding: 15px;
-    border-top: 1px solid #333;
-    background: #181818;
+    border-top: 1px solid #33333300;
+    background: #000000;
     border-radius: 12px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
     transition: box-shadow 0.3s ease-in-out;
   }
   
@@ -231,7 +230,7 @@
   .chat-input button {
     padding: 12px 20px;
     margin-left: 15px;
-    background-color: #0084ff;
+    background-color: #00000000;
     border: none;
     border-radius: 50%;
     color: white;
@@ -241,7 +240,7 @@
   }
   
   .chat-input button:hover {
-    background-color: #00aaff;
+    background-color: #0000003b;
     transform: scale(1.1);
   }
   
@@ -254,6 +253,10 @@
   @media (max-width: 768px) {
     .chat-container {
       flex-direction: column;
+
+
+      width: auto;
+    
     }
   
     .chat-sidebar {
@@ -267,6 +270,7 @@
       width: 100%;
       border-left: none;
       border-radius: 0;
+      height: 100%;
     }
   
     .chat-header {
@@ -285,12 +289,19 @@
   
     .chat-input input {
       font-size: 14px;
-      margin-left: 38px;
+      margin-left: 0px;
+      margin-bottom:12% ;
+      background-color: #382f2f;
     }
   
     .chat-input button {
       font-size: 18px;
       padding: 10px 15px;
+      margin-bottom: 12%;
+    }
+    .chat-input{
+      background-color: #00000042;
+    
     }
   }
   /* Red Dot Notification on user avatar */

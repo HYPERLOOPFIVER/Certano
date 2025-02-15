@@ -1,19 +1,30 @@
 import { useEffect, useState } from "react";
 import { db, auth } from "../../firebase/Firebase";
-import { collection, query, getDocs, onSnapshot, where, addDoc } from "firebase/firestore";
+import {
+  collection,
+  query,
+  getDocs,
+  onSnapshot,
+  where,
+  addDoc,
+  doc,
+  updateDoc,
+} from "firebase/firestore";
 
-// Sound notification
+// Sound notification function
 const playNotificationSound = () => {
-  const audio = new Audio("/path/to/notification-sound.mp3");  // Ensure this path is correct
+  const audio = new Audio("/path/to/notification-sound.mp3");
   audio.play();
 };
 
 const ChatSidebar = ({ onSelectUser }) => {
-  const [users, setUsers] = useState([]); // Stores the list of users the current user has interacted with
+  const [users, setUsers] = useState([]); // Stores the list of chatted users
   const [search, setSearch] = useState("");
+  const [searchResults, setSearchResults] = useState([]); // Stores search results
   const [unreadMessages, setUnreadMessages] = useState({});
-  const [chattedUsers, setChattedUsers] = useState(new Set()); // To track users with whom the current user has chatted
+  const [chattedUsers, setChattedUsers] = useState(new Set()); // Track users with whom the current user has chatted
 
+  // ✅ Fetch the list of users the current user has interacted with
   useEffect(() => {
     const fetchChattedUsers = async () => {
       try {
@@ -21,17 +32,17 @@ const ChatSidebar = ({ onSelectUser }) => {
         const q = query(messagesRef, where("receiverId", "==", auth.currentUser?.uid));
         const querySnapshot = await getDocs(q);
 
-        // Get user IDs of the users the current user has chatted with
         const chattedUserIds = querySnapshot.docs.map((doc) => doc.data().senderId);
-        setChattedUsers(new Set(chattedUserIds));  // Store the chatted user IDs in state
+        setChattedUsers(new Set(chattedUserIds));
       } catch (error) {
         console.error("Error fetching chatted users:", error);
       }
     };
 
     fetchChattedUsers();
-  }, []);  // This effect runs only once when the component mounts
+  }, []);
 
+  // ✅ Real-time listener for unread messages
   useEffect(() => {
     const unsubscribe = onSnapshot(
       collection(db, "messages"),
@@ -52,46 +63,41 @@ const ChatSidebar = ({ onSelectUser }) => {
       }
     );
 
-    return () => unsubscribe(); // Clean up listener when the component is unmounted
+    return () => unsubscribe(); // Cleanup listener on unmount
   }, []);
 
-  const handleUserClick = async (user) => {
-    const userMessagesRef = collection(db, "messages");
-    const q = query(
-      userMessagesRef, 
-      where("senderId", "==", user.id), 
-      where("receiverId", "==", auth.currentUser?.uid), 
-      where("read", "==", false)
-    );
-    const querySnapshot = await getDocs(q);
+  // ✅ Fetch all users (for search functionality)
+  const handleSearch = async (e) => {
+    const queryText = e.target.value;
+    setSearch(queryText);
 
-    // Mark messages as read if there are unread ones
-    querySnapshot.docs.forEach(async (messageDoc) => {
-      const messageRef = doc(db, "messages", messageDoc.id);
-      await updateDoc(messageRef, { read: true });
-    });
-
-    // If this is the first message with this user, initiate a new conversation
-    if (querySnapshot.empty) {
-      // Create a message document to initiate the conversation (this will be the first message)
-      await addDoc(collection(db, "messages"), {
-        senderId: auth.currentUser?.uid,
-        receiverId: user.id,
-        text: "Hello, let's chat!", // This can be any default or first message
-        timestamp: new Date(),
-        read: false,
-      });
+    if (queryText.trim() === "") {
+      setSearchResults([]);
+      return;
     }
 
-    // Set the active user to the selected user
-    onSelectUser(user);
-    setChattedUsers((prev) => new Set(prev.add(user.id)));  // Add to chatted users
+    try {
+      const usersRef = collection(db, "users");
+      const usersSnapshot = await getDocs(usersRef);
+
+      const searchedUsers = usersSnapshot.docs
+        .map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }))
+        .filter(
+          (user) =>
+            user.id !== auth.currentUser.uid && // Exclude current user
+            (user.name?.toLowerCase() || "").includes(queryText.toLowerCase()) // ✅ Fixes undefined error
+        );
+
+      setSearchResults(searchedUsers);
+    } catch (error) {
+      console.error("Error searching users:", error);
+    }
   };
 
-  const handleSearch = async (e) => {
-    setSearch(e.target.value);
-  };
-
+  // ✅ Fetch and set the list of chatted users
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -105,25 +111,51 @@ const ChatSidebar = ({ onSelectUser }) => {
           }))
           .filter((user) => user.id !== auth.currentUser?.uid); // Exclude current user
 
-        // Only show the users with whom the current user has chatted
-        const filteredUsers = allUsers.filter((user) => chattedUsers.has(user.id));
-
-        // If the user is typing a search query, show the results based on the query
-        const filteredAndSearchedUsers = filteredUsers.filter((user) =>
-          user.name.toLowerCase().includes(search.toLowerCase())
-        );
-
-        setUsers(filteredAndSearchedUsers);
+        const interactedUsers = allUsers.filter((user) => chattedUsers.has(user.id));
+        setUsers(interactedUsers);
       } catch (error) {
         console.error("Error fetching users:", error);
       }
     };
 
     fetchUsers();
-  }, [chattedUsers, search]); // Re-fetch users when the chat history or search query changes
+  }, [chattedUsers]);
+
+  // ✅ Handles clicking on a user to chat
+  const handleUserClick = async (user) => {
+    const userMessagesRef = collection(db, "messages");
+    const q = query(
+      userMessagesRef,
+      where("senderId", "==", user.id),
+      where("receiverId", "==", auth.currentUser?.uid),
+      where("read", "==", false)
+    );
+    const querySnapshot = await getDocs(q);
+
+    // Mark messages as read
+    querySnapshot.docs.forEach(async (messageDoc) => {
+      const messageRef = doc(db, "messages", messageDoc.id);
+      await updateDoc(messageRef, { read: true });
+    });
+
+    // Start a conversation if it doesn't exist
+    if (querySnapshot.empty) {
+      await addDoc(collection(db, "messages"), {
+        senderId: auth.currentUser?.uid,
+        receiverId: user.id,
+        text: "Hello, let's chat!",
+        timestamp: new Date(),
+        read: false,
+      });
+    }
+
+    onSelectUser(user);
+    setChattedUsers((prev) => new Set(prev.add(user.id))); // Add to chatted users
+  };
 
   return (
     <div className="chat-sidebar">
+      {/* Search Bar */}
       <input
         type="text"
         placeholder="Search users..."
@@ -132,23 +164,45 @@ const ChatSidebar = ({ onSelectUser }) => {
         className="search-bar"
       />
 
-      {/* If the search query does not match any users, show a no result message */}
-      {users.length === 0 && search && <div>No users found with the search criteria.</div>}
-      
-      {/* Render filtered users (those the current user has chatted with) */}
-      {users.map((user) => (
-        <div key={user.id} onClick={() => handleUserClick(user)} className="user-item">
-          <div className="user-avatar-container">
-            <img
-              src={user.photoURL || "https://www.kravemarketingllc.com/wp-content/uploads/2018/09/placeholder-user-500x500.png"}
-              alt={user.name || "User"}
-              className="user-avatar"
-            />
-            {unreadMessages[user.id] && <div className="notification-dot"></div>}
-          </div>
-          <p>{user.name || "Unknown User"}</p>
-        </div>
-      ))}
+      {/* Show search results if there is a query */}
+      {search.length > 0 ? (
+        searchResults.length === 0 ? (
+          <div>No users found.</div>
+        ) : (
+          searchResults.map((user) => (
+            <div key={user.id} onClick={() => handleUserClick(user)} className="user-item">
+              <div className="user-avatar-container">
+                <img
+                  src={user.photoURL || "https://www.kravemarketingllc.com/wp-content/uploads/2018/09/placeholder-user-500x500.png"}
+                  alt={user.name || "User"}
+                  className="user-avatar"
+                />
+                {unreadMessages[user.id] && <div className="notification-dot"></div>}
+              </div>
+              <p>{user.name || "Unknown User"}</p>
+            </div>
+          ))
+        )
+      ) : (
+        // Show chatted users when there's no search
+        users.length === 0 ? (
+          <div>No recent chats.</div>
+        ) : (
+          users.map((user) => (
+            <div key={user.id} onClick={() => handleUserClick(user)} className="user-item">
+              <div className="user-avatar-container">
+                <img
+                  src={user.photoURL || "https://www.kravemarketingllc.com/wp-content/uploads/2018/09/placeholder-user-500x500.png"}
+                  alt={user.name || "User"}
+                  className="user-avatar"
+                />
+                {unreadMessages[user.id] && <div className="notification-dot"></div>}
+              </div>
+              <p>{user.name || "Unknown User"}</p>
+            </div>
+          ))
+        )
+      )}
     </div>
   );
 };

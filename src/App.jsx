@@ -16,6 +16,8 @@ import AllUsers from "./Pages/Create Post/Profiles";
 import SearchUsers from "./Pages/Create Post/Searchusers";
 import UserProfile from "./Pages/Create Post/UserProfile";
 import ChatPage from "./Componenets/Navbar/ChatPage";
+import ReelsDisplay from "./Pages/Create Post/ReelsDisiplay";
+
 function App() {
   const currentUser = { id: "exampleId", name: "Test User" }; // Replace with actual user
 
@@ -30,8 +32,8 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/News" element={<News />} />
         <Route path="/PostUpload" element={<PostUpload />} />
-        <Route path="/Reelupload" element={<ReelUpload />} />
-        <Route path="/Reels" element={<Reels />} />
+        <Route path="/Reelupload" element={<ReelsDisplay />} />
+        <Route path="/Reels/:id" element={<ReelsDisplay key={window.location.pathname} />} />
         <Route path="/PostIdea" element={<PostIdea />} />
         <Route path="/chat" element={<ChatPage />} />
         <Route path="/serch" element={<SearchUsers />} />
