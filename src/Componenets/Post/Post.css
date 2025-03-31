@@ -1,0 +1,342 @@
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: black;
+  color: white;
+}
+
+.storiesContainer {
+  display: flex;
+  overflow-x: auto;
+  padding: 16px 0;
+  gap: 15px;
+  border-bottom: 1px solid #262626;
+  margin-bottom: 20px;
+}
+
+.story {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  min-width: 66px;
+}
+
+.storyAvatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+  padding: 2px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.storyAvatar img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 2px solid black;
+  object-fit: cover;
+}
+
+.postsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.postCard {
+  border: 1px solid #262626;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.postHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+}
+
+.postUser {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.userAvatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.username {
+  font-weight: 600;
+  color: white;
+  text-decoration: none;
+}
+
+.postOptions {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.postImageContainer {
+  width: 100%;
+  aspect-ratio: 1/1;
+}
+
+.postImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.postActions {
+  display: flex;
+  padding: 8px 16px;
+  gap: 15px;
+}
+
+.actionButton {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.saveButton {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  margin-left: auto;
+}
+
+.postLikes {
+  padding: 0 16px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.postCaption {
+  padding: 0 16px;
+  margin-bottom: 8px;
+}
+
+.captionText {
+  margin-left: 5px;
+}
+
+.postComments {
+  padding: 0 16px;
+  margin-bottom: 8px;
+}
+
+.viewComments {
+  background: none;
+  border: none;
+  color: #8e8e8e;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 4px;
+}
+
+.comment {
+  margin-bottom: 4px;
+}
+
+.commentText {
+  margin-left: 5px;
+}
+
+.postTimestamp {
+  padding: 0 16px;
+  color: #8e8e8e;
+  font-size: 10px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.addComment {
+  display: flex;
+  padding: 16px;
+  border-top: 1px solid #262626;
+}
+
+.commentInput {
+  flex: 1;
+  background: none;
+  border: none;
+  color: white;
+  outline: none;
+}
+
+.postButton {
+  background: none;
+  border: none;
+  color: #0095f6;
+  font-weight: 600;
+  cursor: pointer;
+  opacity: 0.5;
+}
+
+.postButton:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.loadingText, .errorText {
+  color: white;
+  text-align: center;
+  padding: 20px;
+}
+.mainContainer {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: black;
+  color: white;
+  position: relative;
+  padding-bottom: 70px; /* For bottom nav */
+}
+
+/* Header Styles */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background-color: black;
+  border-bottom: 1px solid #333;
+}
+
+.brandLogo {
+  display: flex;
+  align-items: center;
+}
+
+.brandName {
+  font-family: 'Arial', sans-serif;
+  font-weight: 700;
+  font-size: 24px;
+  background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin: 0;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.iconButton {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  position: relative;
+  padding: 5px;
+}
+
+.iconButton:hover {
+  opacity: 0.8;
+}
+
+.notificationBadge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: #ff3040;
+  color: white;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Search Container */
+.searchContainer {
+  padding: 10px 20px;
+  background-color: black;
+  border-bottom: 1px solid #333;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 10px 15px;
+  border-radius: 20px;
+  border: 1px solid #333;
+  background-color: #121212;
+  color: white;
+  font-size: 14px;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: #666;
+}
+
+/* Notifications Panel */
+.notificationsPanel {
+  position: absolute;
+  top: 60px;
+  right: 20px;
+  width: 300px;
+  max-height: 400px;
+  overflow-y: auto;
+  background-color: #121212;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  padding: 15px;
+}
+
+.notificationHeader {
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-size: 16px;
+  font-weight: 600;
+  border-bottom: 1px solid #333;
+  padding-bottom: 10px;
+}
+
+.notificationItem {
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #222;
+}
+
+.notificationAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.notificationContent {
+  flex: 1;
+}
+
+.notificationContent p {
+  margin: 0 0 5px 0;
+}

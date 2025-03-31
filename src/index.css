@@ -1,0 +1,30 @@
+/* Default Styles */
+body {
+  background-image: url(./DALL·E\ 2024-12-15\ 14.47.28\ -\ A\ minimalist\ design\ with\ a\ white\ background\ featuring\ gradient\ spheres.\ The\ spheres\ should\ have\ smooth\,\ vibrant\ radial\ gradients\ in\ colors\ like\ blue\,\ .webp);
+  margin-left: 5%; /* For desktop view */
+}
+
+/* Media Query for Mobile View */
+@media (max-width: 768px) {
+  body {
+    margin-left: 0; /* Remove margin for phone view */
+  }
+}
+
+p{
+
+  color: rgb(0, 0, 0);
+}
+h1{
+  color: rgb(0, 0, 0);
+}
+h2{
+  color: white;
+}
+h3{
+  color: rgb(0, 0, 0);
+}
+h4{
+  color: rgb(0, 0, 0);
+}
+

@@ -1,0 +1,19 @@
+.Certtimes{
+font-family: 'Times New Roman', Times, serif;
+font-weight: bolder;
+color: rgb(199, 236, 224);
+}
+.articleTitle{
+    text-decoration: none;
+    color: white;
+   font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+  
+    
+
+
+}
+.articleImage
+{
+    height: 200px;
+}
+a{text-decoration: none;}
