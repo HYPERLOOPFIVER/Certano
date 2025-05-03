@@ -1,57 +1,192 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { db } from '../../firebase/Firebase';
-import { collection, getDocs, updateDoc, doc, increment, arrayUnion, arrayRemove } from 'firebase/firestore';
-import { FaHeart, FaCommentAlt, FaShare, FaVolumeMute, FaVolumeUp } from 'react-icons/fa';
+import { db, auth } from '../../firebase/Firebase';
+import { 
+  collection, 
+  getDocs, 
+  getDoc,
+  doc, 
+  updateDoc, 
+  increment, 
+  arrayUnion, 
+  arrayRemove,
+  query,
+  orderBy,
+  limit 
+} from 'firebase/firestore';
+import { onAuthStateChanged } from 'firebase/auth';
+import { FaHeart, FaCommentAlt, FaShare, FaVolumeMute, FaVolumeUp, FaArrowLeft } from 'react-icons/fa';
 import '../Create Post/ReelsDisiplay.css';
 
 const ReelsDisplay = () => {
-  const { id } = useParams(); // Get the reel id from URL params
+  const { id } = useParams();
   const navigate = useNavigate();
-  const [reels, setReels] = useState([]); // Store the list of reels
-  const [currentReelIndex, setCurrentReelIndex] = useState(0); // Track the current reel index
+  const [reels, setReels] = useState([]);
+  const [currentReelIndex, setCurrentReelIndex] = useState(0);
   const [newComment, setNewComment] = useState('');
   const [commentPopup, setCommentPopup] = useState(false);
-  const [muted, setMuted] = useState(false);
-  const [isLoading, setIsLoading] = useState(true); // Add a loading state
-  const reelContainerRef = useRef(null); // Ref for the reel container
-  const currentUserId = 'exampleUserId'; // Replace with actual user ID
-  const currentUserName = 'Example User'; // Replace with actual user name
+  const [muted, setMuted] = useState(true); // Default to muted
+  const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState(null);
+  const [error, setError] = useState('');
+  const reelContainerRef = useRef(null);
+  const videoRef = useRef(null);
+
+  // Check for authenticated user
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        setUser(currentUser);
+      } else {
+        setUser(null);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   // Fetch all reels once on mount
   useEffect(() => {
     const fetchReels = async () => {
-      const reelsCollection = collection(db, 'reels');
-      const reelsSnapshot = await getDocs(reelsCollection);
-      const reelsList = reelsSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      setReels(reelsList);
-      setIsLoading(false); // Set loading to false after fetching
+      try {
+        setIsLoading(true);
+        console.log('Fetching reels...');
+        
+        // First check if the specific reel exists if we have an ID
+        let specificReel = null;
+        if (id) {
+          const reelDocRef = doc(db, 'reels', id);
+          const reelDoc = await getDoc(reelDocRef);
+          
+          if (reelDoc.exists()) {
+            specificReel = { id: reelDoc.id, ...reelDoc.data() };
+            console.log('Found specific reel:', specificReel);
+          } else {
+            console.log('Reel not found with ID:', id);
+          }
+        }
+        
+        // Get all reels ordered by creation date
+        const reelsQuery = query(
+          collection(db, 'reels'),
+          orderBy('createdAt', 'desc'),
+          limit(20)
+        );
+        
+        const reelsSnapshot = await getDocs(reelsQuery);
+        let reelsList = reelsSnapshot.docs.map((doc) => ({ 
+          id: doc.id, 
+          ...doc.data(),
+          // Convert Firestore timestamp to JS Date for sorting
+          createdAt: doc.data().createdAt?.toDate?.() || new Date()
+        }));
+        
+        console.log(`Fetched ${reelsList.length} reels`);
+        
+        // Ensure we have proper defaults for fields
+        reelsList = reelsList.map(reel => ({
+          ...reel,
+          likes: reel.likes || 0,
+          comments: reel.comments || [],
+          likedUsers: reel.likedUsers || [],
+          views: reel.views || 0
+        }));
+        
+        setReels(reelsList);
+        
+        // If we have a specific reel ID, find its index
+        if (specificReel) {
+          const reelIndex = reelsList.findIndex((reel) => reel.id === id);
+          setCurrentReelIndex(reelIndex >= 0 ? reelIndex : 0);
+        }
+        
+        setIsLoading(false);
+      } catch (err) {
+        console.error('Error fetching reels:', err);
+        setError('Failed to load reels. Please try again later.');
+        setIsLoading(false);
+      }
     };
+    
     fetchReels();
-  }, []);
+  }, [id]);
 
-  // Set the current reel index based on the `id` from URL
+  // Update view count when a reel is viewed
   useEffect(() => {
-    if (!isLoading && reels.length > 0) {
-      const reelIndex = reels.findIndex((reel) => reel.id === id);
-      setCurrentReelIndex(reelIndex >= 0 ? reelIndex : 0); // Set the reel index, default to 0 if not found
+    const updateViewCount = async () => {
+      if (reels.length === 0 || isLoading) return;
+      
+      const currentReel = reels[currentReelIndex];
+      if (!currentReel) return;
+      
+      try {
+        const reelDocRef = doc(db, 'reels', currentReel.id);
+        await updateDoc(reelDocRef, {
+          views: increment(1)
+        });
+        
+        // Update local state
+        setReels(prevReels => {
+          const updatedReels = [...prevReels];
+          updatedReels[currentReelIndex] = {
+            ...currentReel,
+            views: (currentReel.views || 0) + 1
+          };
+          return updatedReels;
+        });
+        
+        // Update URL to match current reel
+        navigate(`/reels/${currentReel.id}`, { replace: true });
+      } catch (err) {
+        console.error('Error updating view count:', err);
+      }
+    };
+    
+    updateViewCount();
+  }, [currentReelIndex, reels, isLoading, navigate]);
+
+  // Play the video when the current reel changes
+  useEffect(() => {
+    if (reels.length === 0 || isLoading) return;
+    
+    const currentReel = reels[currentReelIndex];
+    if (!currentReel) return;
+    
+    console.log('Playing reel:', currentReel.id);
+    
+    const videoElement = document.getElementById(`video-${currentReel.id}`);
+    if (videoElement) {
+      videoRef.current = videoElement;
+      videoElement.pause();
+      videoElement.currentTime = 0;
+      
+      // Wait a brief moment to ensure video is ready
+      setTimeout(() => {
+        const playPromise = videoElement.play();
+        
+        if (playPromise !== undefined) {
+          playPromise.catch(error => {
+            console.error('Error playing video:', error);
+          });
+        }
+      }, 100);
     }
-  }, [id, reels, isLoading]); // Add isLoading as a dependency
+  }, [currentReelIndex, reels, isLoading]);
 
   // Handle swipe gestures (up/down)
   useEffect(() => {
     const handleWheel = (e) => {
+      if (reels.length <= 1) return;
+      
       if (e.deltaY > 0) {
         // Swipe down: go to the next reel
         if (currentReelIndex < reels.length - 1) {
-          setCurrentReelIndex((prev) => prev + 1);
-          navigate(`/reels/${reels[currentReelIndex + 1].id}`);
+          setCurrentReelIndex(prev => prev + 1);
         }
       } else if (e.deltaY < 0) {
         // Swipe up: go to the previous reel
         if (currentReelIndex > 0) {
-          setCurrentReelIndex((prev) => prev - 1);
-          navigate(`/reels/${reels[currentReelIndex - 1].id}`);
+          setCurrentReelIndex(prev => prev - 1);
         }
       }
     };
@@ -66,46 +201,56 @@ const ReelsDisplay = () => {
         container.removeEventListener('wheel', handleWheel);
       }
     };
-  }, [currentReelIndex, reels, navigate]);
-
-  // Play the video when the current reel changes
-  useEffect(() => {
-    if (reels[currentReelIndex]) {
-      const videoElement = document.getElementById(`video-${reels[currentReelIndex].id}`);
-      if (videoElement) {
-        videoElement.pause(); // Pause the current video
-        videoElement.load(); // Load the new video source
-        videoElement.play(); // Play the new video
-      }
-    }
   }, [currentReelIndex, reels]);
 
-  // Handle the like functionality
+  // Handle keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'ArrowDown' && currentReelIndex < reels.length - 1) {
+        setCurrentReelIndex(prev => prev + 1);
+      } else if (e.key === 'ArrowUp' && currentReelIndex > 0) {
+        setCurrentReelIndex(prev => prev - 1);
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [currentReelIndex, reels]);
+
+  // Handle like functionality
   const handleLike = async () => {
+    if (!user) {
+      alert('Please log in to like reels');
+      return;
+    }
+    
     const currentReel = reels[currentReelIndex];
     if (!currentReel) return;
 
-    // Check if the current user has already liked the reel
-    const hasLiked = currentReel.likedUsers?.includes(currentUserId);
+    const userId = user.uid;
+    const hasLiked = currentReel.likedUsers?.includes(userId);
 
     try {
       const reelDocRef = doc(db, 'reels', currentReel.id);
 
       // Update the Firestore document
       await updateDoc(reelDocRef, {
-        likes: increment(hasLiked ? -1 : 1), // Decrease or increase likes
-        likedUsers: hasLiked ? arrayRemove(currentUserId) : arrayUnion(currentUserId), // Remove or add user ID
+        likes: increment(hasLiked ? -1 : 1),
+        likedUsers: hasLiked ? arrayRemove(userId) : arrayUnion(userId),
       });
 
       // Update the local state
-      setReels((prevReels) => {
+      setReels(prevReels => {
         const updatedReels = [...prevReels];
         updatedReels[currentReelIndex] = {
           ...currentReel,
           likes: currentReel.likes + (hasLiked ? -1 : 1),
           likedUsers: hasLiked
-            ? currentReel.likedUsers.filter((uid) => uid !== currentUserId) // Remove user ID if unliked
-            : [...(currentReel.likedUsers || []), currentUserId], // Add user ID if liked
+            ? currentReel.likedUsers.filter(uid => uid !== userId)
+            : [...(currentReel.likedUsers || []), userId],
         };
         return updatedReels;
       });
@@ -116,60 +261,118 @@ const ReelsDisplay = () => {
 
   // Handle comment submission
   const handleCommentSubmit = async () => {
+    if (!user) {
+      alert('Please log in to comment');
+      return;
+    }
+    
     const currentReel = reels[currentReelIndex];
     if (!newComment.trim() || !currentReel) return;
-    const reelDocRef = doc(db, 'reels', currentReel.id);
-    await updateDoc(reelDocRef, {
-      comments: arrayUnion({ text: newComment.trim(), userId: currentUserId, userName: currentUserName, timestamp: new Date() }),
-    });
-    setReels((prevReels) => {
-      const updatedReels = [...prevReels];
-      updatedReels[currentReelIndex] = {
-        ...currentReel,
-        comments: [...(currentReel.comments || []), { text: newComment.trim(), userId: currentUserId, userName: currentUserName, timestamp: new Date() }],
-      };
-      return updatedReels;
-    });
-    setNewComment('');
+    
+    const commentData = {
+      text: newComment.trim(),
+      userId: user.uid,
+      userName: user.displayName || 'Anonymous User',
+      userPhoto: user.photoURL || '',
+      timestamp: new Date()
+    };
+    
+    try {
+      const reelDocRef = doc(db, 'reels', currentReel.id);
+      await updateDoc(reelDocRef, {
+        comments: arrayUnion(commentData),
+      });
+      
+      setReels(prevReels => {
+        const updatedReels = [...prevReels];
+        updatedReels[currentReelIndex] = {
+          ...currentReel,
+          comments: [...(currentReel.comments || []), commentData],
+        };
+        return updatedReels;
+      });
+      
+      setNewComment('');
+    } catch (error) {
+      console.error('Error adding comment:', error);
+    }
   };
 
   // Toggle mute/unmute for the video
-  const toggleMute = () => setMuted((prev) => !prev);
+  const toggleMute = () => {
+    setMuted(prev => !prev);
+    if (videoRef.current) {
+      videoRef.current.muted = !videoRef.current.muted;
+    }
+  };
+
+  // Go back to previous page
+  const goBack = () => {
+    navigate(-1);
+  };
 
   if (isLoading) {
-    return <div>Loading...</div>; // Show a loading indicator
+    return (
+      <div className="loading-container">
+        <div className="loading-spinner"></div>
+        <p>Loading reels...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="error-container">
+        <p>{error}</p>
+        <button onClick={() => window.location.reload()}>Retry</button>
+      </div>
+    );
   }
 
   if (reels.length === 0) {
-    return <div>No reels found.</div>; // Fallback if no reels are found
+    return (
+      <div className="no-reels-container">
+        <p>No reels found.</p>
+        <button onClick={() => navigate('/reels/upload')}>Upload a Reel</button>
+      </div>
+    );
   }
 
   const currentReel = reels[currentReelIndex];
+  if (!currentReel) {
+    return <div className="error-container">Reel not found</div>;
+  }
+
+  // Check if the current user has liked this reel
+  const isLiked = user && currentReel.likedUsers?.includes(user.uid);
 
   return (
     <div className="reel-container" ref={reelContainerRef}>
+      <div className="reel-header">
+        <button className="back-button" onClick={goBack}>
+          <FaArrowLeft />
+        </button>
+        <h2>Reels</h2>
+      </div>
+      
       <div className="reel-item">
         <video
           id={`video-${currentReel.id}`}
+          src={currentReel.video}
           playsInline
           muted={muted}
           loop
           className="reel-video"
-        >
-          <source src={currentReel.video} type="video/mp4" />
-          Your browser does not support the video tag.
-        </video>
+        />
+        
         <div className="reel-actions">
-          <button onClick={handleLike} className="reel-action">
-            <FaHeart
-              style={{
-                color: currentReel.likedUsers?.includes(currentUserId) ? 'red' : 'white', // Change heart color if liked
-              }}
-            />{' '}
-            {currentReel.likes || 0}
+          <button onClick={handleLike} className={`reel-action ${isLiked ? 'liked' : ''}`}>
+            <FaHeart color={isLiked ? 'red' : 'white'} /> 
+            <span>{currentReel.likes}</span>
           </button>
           <button onClick={() => setCommentPopup(true)} className="reel-action">
-            <FaCommentAlt /> {currentReel.comments?.length || 0}
+            <FaCommentAlt /> 
+            <span>{currentReel.comments?.length || 0}</span>
           </button>
           <button onClick={toggleMute} className="reel-action">
             {muted ? <FaVolumeMute /> : <FaVolumeUp />}
@@ -178,28 +381,89 @@ const ReelsDisplay = () => {
             <FaShare />
           </button>
         </div>
+        
         <div className="reel-details">
+          <div className="reel-user-info">
+            {currentReel.userPhoto && (
+              <img src={currentReel.userPhoto} alt="User" className="user-avatar" />
+            )}
+            <span className="user-name">{currentReel.userName || 'Anonymous'}</span>
+          </div>
           <h3>{currentReel.title}</h3>
           <p>{currentReel.description}</p>
+          <p className="reel-views">{currentReel.views || 0} views</p>
+        </div>
+        
+        <div className="reel-navigation">
+          {currentReelIndex > 0 && (
+            <button 
+              className="nav-button prev" 
+              onClick={() => setCurrentReelIndex(prev => prev - 1)}
+            >
+              ▲
+            </button>
+          )}
+          {currentReelIndex < reels.length - 1 && (
+            <button 
+              className="nav-button next" 
+              onClick={() => setCurrentReelIndex(prev => prev + 1)}
+            >
+              ▼
+            </button>
+          )}
         </div>
       </div>
 
       {commentPopup && (
         <div className="comment-popup">
           <div className="comment-popup-content">
-            <h3>Comments</h3>
-            <button onClick={() => setCommentPopup(false)} className="close-btn">
-              &times;
-            </button>
-            <ul>
-              {currentReel.comments?.map((comment, index) => (
-                <li key={index}>
-                  <strong>{comment.userName}:</strong> {comment.text}
-                </li>
-              ))}
-            </ul>
-            <input type="text" placeholder="Add a comment..." value={newComment} onChange={(e) => setNewComment(e.target.value)} />
-            <button onClick={handleCommentSubmit}>Submit</button>
+            <div className="comment-header">
+              <h3>Comments ({currentReel.comments?.length || 0})</h3>
+              <button onClick={() => setCommentPopup(false)} className="close-btn">
+                &times;
+              </button>
+            </div>
+            
+            <div className="comments-list">
+              {currentReel.comments?.length > 0 ? (
+                <ul>
+                  {currentReel.comments.map((comment, index) => (
+                    <li key={index} className="comment-item">
+                      {comment.userPhoto && (
+                        <img src={comment.userPhoto} alt="User" className="comment-user-avatar" />
+                      )}
+                      <div className="comment-content">
+                        <strong>{comment.userName || 'Anonymous'}</strong>
+                        <p>{comment.text}</p>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="no-comments">No comments yet. Be the first to comment!</p>
+              )}
+            </div>
+            
+            <div className="comment-input-container">
+              <input 
+                type="text" 
+                placeholder="Add a comment..." 
+                value={newComment} 
+                onChange={(e) => setNewComment(e.target.value)}
+                className="comment-input"
+              />
+              <button 
+                onClick={handleCommentSubmit}
+                disabled={!newComment.trim() || !user}
+                className="comment-submit"
+              >
+                Submit
+              </button>
+            </div>
+            
+            {!user && (
+              <p className="login-prompt">Please log in to comment</p>
+            )}
           </div>
         </div>
       )}
