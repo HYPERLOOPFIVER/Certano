@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { db, auth } from '../../firebase/Firebase';
-import { collection, addDoc } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const CLOUD_NAME = 'dzf155vhq';
 const UPLOAD_PRESET = 'posts_certano';
@@ -12,16 +12,18 @@ const ReelUpload = () => {
   const [description, setDescription] = useState('');
   const [videoFile, setVideoFile] = useState(null);
   const [videoUrl, setVideoUrl] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState('');
   const [user, setUser] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
-        console.log('User logged in:', currentUser.uid); // Debug log
+        console.log('User logged in:', currentUser.uid);
         setUser(currentUser);
       } else {
-        console.log('No user logged in'); // Debug log
+        console.log('No user logged in');
         setUser(null);
       }
     });
@@ -29,23 +31,39 @@ const ReelUpload = () => {
     return () => unsubscribe();
   }, []);
 
-  const handleVideoUpload = async (e) => {
+  const handleVideoChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('upload_preset', UPLOAD_PRESET);
+      setVideoFile(file);
+    }
+  };
 
-      try {
-        const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/video/upload`, {
-          method: 'POST',
-          body: formData,
-        });
-        const data = await response.json();
-        setVideoUrl(data.secure_url); // Get the uploaded video URL
-      } catch (error) {
-        setError('Error uploading video');
+  const handleVideoUpload = async () => {
+    if (!videoFile) return null;
+    
+    setIsUploading(true);
+    const formData = new FormData();
+    formData.append('file', videoFile);
+    formData.append('upload_preset', UPLOAD_PRESET);
+
+    try {
+      const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/video/upload`, {
+        method: 'POST',
+        body: formData,
+      });
+      
+      if (!response.ok) {
+        throw new Error('Video upload failed');
       }
+      
+      const data = await response.json();
+      setIsUploading(false);
+      return data.secure_url;
+    } catch (error) {
+      console.error('Error uploading video:', error);
+      setError('Error uploading video: ' + error.message);
+      setIsUploading(false);
+      return null;
     }
   };
 
@@ -57,29 +75,50 @@ const ReelUpload = () => {
       return;
     }
 
-    if (!title || !description || !videoUrl) {
+    if (!title || !description || !videoFile) {
       setError('All fields are required');
       return;
     }
 
     try {
-      await addDoc(collection(db, 'reels'), {
+      // First upload the video to Cloudinary
+      const uploadedVideoUrl = await handleVideoUpload();
+      
+      if (!uploadedVideoUrl) {
+        setError('Video upload failed. Please try again.');
+        return;
+      }
+
+      // Then save the reel data to Firestore
+      const reelData = {
         title,
         description,
-        video: videoUrl,
-        uid: user.uid, // Correct user ID
-        createdAt: new Date(),
-        likes: 0, // Initial likes
-        comments: [], // Initial empty comments
-        views: 0, // Initial views
-      });
+        video: uploadedVideoUrl,
+        uid: user.uid,
+        userName: user.displayName || 'Anonymous User',
+        userPhoto: user.photoURL || '',
+        createdAt: serverTimestamp(),
+        likes: 0,
+        likedUsers: [],
+        comments: [],
+        views: 0,
+      };
+
+      const docRef = await addDoc(collection(db, 'reels'), reelData);
+      console.log('Reel uploaded with ID:', docRef.id);
 
       setTitle('');
       setDescription('');
+      setVideoFile(null);
       setVideoUrl('');
       setError('');
-      alert('Reel uploaded successfully');
+      
+      alert('Reel uploaded successfully!');
+      
+      // Navigate to the reels view page to see the uploaded reel
+      navigate(`/reels/${docRef.id}`);
     } catch (error) {
+      console.error('Error uploading reel:', error);
       setError('Error uploading reel: ' + error.message);
     }
   };
@@ -123,6 +162,7 @@ const ReelUpload = () => {
       color: '#FFF',
       fontWeight: 'bold',
       cursor: 'pointer',
+      opacity: isUploading ? 0.7 : 1,
     },
     error: {
       color: 'red',
@@ -136,6 +176,11 @@ const ReelUpload = () => {
     heading: {
       marginBottom: '20px',
     },
+    linkButton: {
+      marginTop: '20px',
+      color: '#BB86FC',
+      textDecoration: 'none',
+    }
   };
 
   return (
@@ -163,20 +208,27 @@ const ReelUpload = () => {
         <input
           type="file"
           accept="video/*"
-          onChange={handleVideoUpload}
+          onChange={handleVideoChange}
           required
           style={styles.input}
         />
-        {videoUrl && (
-          <video controls width="100%" style={styles.videoPreview}>
-            <source src={videoUrl} type="video/mp4" />
-            Your browser does not support the video tag.
-          </video>
+        {videoFile && (
+          <div style={styles.videoPreview}>
+            <p>Selected file: {videoFile.name}</p>
+          </div>
         )}
-        <button type="submit" disabled={!user} style={styles.button}>Upload Reel</button>
+        <button 
+          type="submit" 
+          disabled={!user || isUploading} 
+          style={styles.button}
+        >
+          {isUploading ? 'Uploading...' : 'Upload Reel'}
+        </button>
       </form>
 
       {!user && <p style={styles.error}>Please log in to upload a reel.</p>}
+      
+      <Link to="/reels" style={styles.linkButton}>View All Reels</Link>
     </div>
   );
 };
