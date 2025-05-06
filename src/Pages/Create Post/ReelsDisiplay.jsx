@@ -45,32 +45,18 @@ const ReelsDisplay = () => {
     return () => unsubscribe();
   }, []);
 
-  // Fetch all reels once on mount
+  // Fetch all reels - simplified and more robust approach
   useEffect(() => {
     const fetchReels = async () => {
       try {
         setIsLoading(true);
-        console.log('Fetching reels...');
+        console.log('Fetching all reels...');
         
-        // First check if the specific reel exists if we have an ID
-        let specificReel = null;
-        if (id) {
-          const reelDocRef = doc(db, 'reels', id);
-          const reelDoc = await getDoc(reelDocRef);
-          
-          if (reelDoc.exists()) {
-            specificReel = { id: reelDoc.id, ...reelDoc.data() };
-            console.log('Found specific reel:', specificReel);
-          } else {
-            console.log('Reel not found with ID:', id);
-          }
-        }
-        
-        // Get all reels ordered by creation date
+        // Get all reels ordered by creation date without any conditions
         const reelsQuery = query(
           collection(db, 'reels'),
           orderBy('createdAt', 'desc'),
-          limit(20)
+          limit(50) // Increased limit to ensure we get more reels
         );
         
         const reelsSnapshot = await getDocs(reelsQuery);
@@ -92,12 +78,15 @@ const ReelsDisplay = () => {
           views: reel.views || 0
         }));
         
+        // Set all fetched reels to state
         setReels(reelsList);
         
         // If we have a specific reel ID, find its index
-        if (specificReel) {
+        if (id) {
           const reelIndex = reelsList.findIndex((reel) => reel.id === id);
-          setCurrentReelIndex(reelIndex >= 0 ? reelIndex : 0);
+          if (reelIndex >= 0) {
+            setCurrentReelIndex(reelIndex);
+          }
         }
         
         setIsLoading(false);
@@ -109,7 +98,18 @@ const ReelsDisplay = () => {
     };
     
     fetchReels();
-  }, [id]);
+  }, []); // Remove id dependency to prevent re-fetching when id changes
+  
+  // Update URL to reflect current reel ID for sharing/bookmarking
+  useEffect(() => {
+    if (reels.length === 0 || isLoading) return;
+    
+    const currentReel = reels[currentReelIndex];
+    if (!currentReel) return;
+    
+    // Update URL without re-rendering
+    window.history.replaceState(null, '', `/reels/${currentReel.id}`);
+  }, [currentReelIndex, reels, isLoading]);
 
   // Update view count when a reel is viewed
   useEffect(() => {
@@ -134,16 +134,13 @@ const ReelsDisplay = () => {
           };
           return updatedReels;
         });
-        
-        // Update URL to match current reel
-        navigate(`/reels/${currentReel.id}`, { replace: true });
       } catch (err) {
         console.error('Error updating view count:', err);
       }
     };
     
     updateViewCount();
-  }, [currentReelIndex, reels, isLoading, navigate]);
+  }, [currentReelIndex, reels, isLoading]);
 
   // Play the video when the current reel changes
   useEffect(() => {
@@ -154,11 +151,18 @@ const ReelsDisplay = () => {
     
     console.log('Playing reel:', currentReel.id);
     
+    // Stop all videos first
+    const allVideos = document.querySelectorAll('video');
+    allVideos.forEach(video => {
+      video.pause();
+    });
+    
+    // Play only the current video
     const videoElement = document.getElementById(`video-${currentReel.id}`);
     if (videoElement) {
       videoRef.current = videoElement;
-      videoElement.pause();
       videoElement.currentTime = 0;
+      videoElement.muted = muted;
       
       // Wait a brief moment to ensure video is ready
       setTimeout(() => {
@@ -167,11 +171,15 @@ const ReelsDisplay = () => {
         if (playPromise !== undefined) {
           playPromise.catch(error => {
             console.error('Error playing video:', error);
+            // Try playing again after a moment
+            setTimeout(() => {
+              videoElement.play().catch(e => console.error('Second play attempt failed:', e));
+            }, 500);
           });
         }
       }, 100);
     }
-  }, [currentReelIndex, reels, isLoading]);
+  }, [currentReelIndex, reels, isLoading, muted]);
 
   // Handle swipe gestures (up/down)
   useEffect(() => {
@@ -201,7 +209,7 @@ const ReelsDisplay = () => {
         container.removeEventListener('wheel', handleWheel);
       }
     };
-  }, [currentReelIndex, reels]);
+  }, [currentReelIndex, reels.length]);
 
   // Handle keyboard navigation
   useEffect(() => {
@@ -218,7 +226,7 @@ const ReelsDisplay = () => {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [currentReelIndex, reels]);
+  }, [currentReelIndex, reels.length]);
 
   // Handle like functionality
   const handleLike = async () => {
@@ -302,7 +310,7 @@ const ReelsDisplay = () => {
   const toggleMute = () => {
     setMuted(prev => !prev);
     if (videoRef.current) {
-      videoRef.current.muted = !videoRef.current.muted;
+      videoRef.current.muted = !muted;
     }
   };
 
@@ -311,6 +319,7 @@ const ReelsDisplay = () => {
     navigate(-1);
   };
 
+  // Render loading state
   if (isLoading) {
     return (
       <div className="loading-container">
@@ -320,6 +329,7 @@ const ReelsDisplay = () => {
     );
   }
 
+  // Render error state
   if (error) {
     return (
       <div className="error-container">
@@ -329,6 +339,7 @@ const ReelsDisplay = () => {
     );
   }
 
+  // Render empty state
   if (reels.length === 0) {
     return (
       <div className="no-reels-container">
@@ -358,7 +369,7 @@ const ReelsDisplay = () => {
       <div className="reel-item">
         <video
           id={`video-${currentReel.id}`}
-          src={currentReel.video}
+          src={currentReel.videoUrl}
           playsInline
           muted={muted}
           loop
